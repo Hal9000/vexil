@@ -7,14 +7,10 @@ defmodule Grid do
   def put(grid, {:blue, x, y}, piece), do: Map.put(grid, {:red, 22-x, 22-y}, piece)
 
   def show_cell(grid, xx, yy) do
-    bot = Grid.get(grid, {:red, xx, yy})
-    char = 
-    if bot == nil do
-      "-"
-    else
-      Bot.to_string(bot)
-    end
-    IO.write "#{char} "
+    grid
+    |> Grid.get({:red, xx, yy})
+    |> Bot.to_string
+    |> IO.write
   end
 
   def cell_empty?(grid, triple) do

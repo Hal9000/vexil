@@ -22,7 +22,7 @@ defmodule Bot do
     apply(Bot, kind, {team, x, y})
   end
 
-  def to_string(bot) do
+  def to_string(bot) when bot != nil do
     initial = bot.kind |> Atom.to_string |> String.capitalize |> String.first
     char = if bot.kind == :flag, do: "X", else: initial
     str = 
@@ -33,5 +33,7 @@ defmodule Bot do
     end
     str
   end
+
+  def to_string(nil), do: "-"
 
 end
