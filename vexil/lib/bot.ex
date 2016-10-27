@@ -1,8 +1,6 @@
 defmodule Bot do
 
-  defstruct team: nil, kind: nil, move: nil, see: nil, 
-            defend: nil, attack: nil, range: nil, 
-            x: nil, y: nil
+  defstruct [:team, :kind, :move, :see, :defend, :attack, :range, :x, :y]
 
   def defender(team, x, y) do
     %Bot{team: team, kind: :defender, move: 2, see: 3, defend: 6, attack: 4, range: 2, x: x, y: y}
@@ -21,7 +19,7 @@ defmodule Bot do
   end
 
   def make(kind, team, x, y) do
-    apply(Bot, kind, [team, x, y])
+    apply(Bot, kind, {team, x, y})
   end
 
   def to_string(bot) do

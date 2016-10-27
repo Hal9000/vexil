@@ -6,8 +6,8 @@ defmodule Referee do
     y2 = if Range.range?(y), do: rand(y), else: y
     
     bot = Bot.make(kind, team, x, y)
-    grid = if Grid.cell_empty?(grid, [team, x2, y2]) do
-      Grid.put(grid, [team, x2, y2], bot)
+    grid = if Grid.cell_empty?(grid, {team, x2, y2}) do
+      Grid.put(grid, {team, x2, y2}, bot)
     else
       place(grid, team, kind, x, y)
     end
