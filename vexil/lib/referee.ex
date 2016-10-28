@@ -1,7 +1,6 @@
 defmodule Referee do
 
   def place(grid, team, kind, x, y) do
-# IO.inspect [team, kind, x, y]
     x2 = if Range.range?(x), do: rand(x), else: x
     y2 = if Range.range?(y), do: rand(y), else: y
     
@@ -11,15 +10,15 @@ defmodule Referee do
     else
       place(grid, team, kind, x, y)
     end
-    # FIXME  pieces[team] << bot
+    # How to collect list of each team's pieces? see ruby code: pieces[team]
     grid
   end
 
-  def rand(n) when is_integer(n), do: :rand.uniform(n)
+  def rand(n) when is_integer(n), do: :rand.uniform(n)  # Will be in Kernel soon
   def rand(n1..n2), do: :rand.uniform(n2 - n1 + 1) + n1 - 1
 
   def setup(grid) do
-    grid = setup(grid, :red)     ### line 22
+    grid = setup(grid, :red)
     grid = setup(grid, :blue)
     grid
   end
