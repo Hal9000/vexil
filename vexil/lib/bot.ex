@@ -19,7 +19,7 @@ defmodule Bot do
   end
 
   def make(kind, team, x, y) do
-    apply(Bot, kind, {team, x, y})
+    apply(Bot, kind, [team, x, y])
   end
 
   def to_string(bot) when bot != nil do
