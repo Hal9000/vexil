@@ -1,30 +1,20 @@
-# This file is responsible for configuring your application
-# and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-# This configuration is loaded before any dependency and is restricted
-# to this project. If another project depends on this project, this
-# file won't be loaded nor affect the parent project. For this reason,
-# if you want to provide default values for your application for
-# 3rd-party users, it should be done in your "mix.exs" file.
+config :vexil, :bot,
+  count:      [defender: 3, fighter: 6, scout: 8],
+  start_edge: [defender: 5, fighter: 6, scout: 8..9],
+  stats: [
+    defender: [attack: 4, defend: 6, move: 2, range: 2, see: 2],
+    fighter:  [attack: 6, defend: 6, move: 4, range: 4, see: 2],
+    scout:    [attack: 2, defend: 3, move: 5, range: 1, see: 2]
+  ]
 
-# You can configure for your application as:
-#
-#     config :vexil, key: :value
-#
-# And access this configuration in your application as:
-#
-#     Application.get_env(:vexil, :key)
-#
-# Or configure a 3rd-party app:
-#
-#     config :logger, level: :info
-#
+config :vexil, :battleground,
+  flag_max_edge: 4,
+  neutral_extra_space: 5
 
-# It is also possible to import configuration files, relative to this
-# directory. For example, you can emulate configuration per environment
-# by uncommenting the line below and defining dev.exs, test.exs and such.
-# Configuration from the imported file will override the ones defined
-# here (which is why it is important to import them last).
-#
-#     import_config "#{Mix.env}.exs"
+config :vexil, :teams,
+  coral: "Red monkeys",
+  mediumblue: "Blue pigs",
+  greenyellow: "Yellow Submarine",
+  orange: "Power Oranges"
