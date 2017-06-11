@@ -39,14 +39,51 @@ defmodule Bot do
   def move(game, bot, dx, dy) do
     x2 = bot.x + dx
     y2 = bot.y + dy
-#   if $game.move(@team, @x, @y, x2, y2)
-#     return if $game.over?
-#     $game.record("#{self.who} moves to #@x,#@y")
-#     @x, @y = x2, y2
-#     return true
-#   end
-#   false
+
+    # FIXME will send msg to referee
+
     {game, bot}
+  end
+
+  def turn(:fighter, bot, refpid, game) do
+    # FIXME will call move, attack
+##    return if $game.over?
+##    seek_flag
+##
+##    @strength = @attack
+##    victims = can_attack
+##    victims.each {|enemy| try_attack(2, enemy) || break }
+##    move!(2, 2)
+  end
+
+  def turn(:defender, bot, refpid, game) do
+    # FIXME will call move, attack
+##    return if $game.over?
+##    @strength = @attack
+##    victims = can_attack
+##    victims.each {|enemy| try_attack(3, enemy) || break }
+  end
+
+  def turn(:scout, bot, refpid, game) do
+    # FIXME will call move, attack
+##    return if $game.over?
+##    seek_flag
+##
+##    @strength = @attack
+##    victims = can_attack
+##    victims.each {|enemy| try_attack(1, enemy) || break }
+##    move!(3, 3)
+  end
+
+  def mainloop(bot, refpid, game) do
+    # the bot lives its life -- run, attack, whatever
+    # see 'turn' in Ruby version
+    turn(bot.kind, bot, refpid, game)
+    mainloop(bot, refpid, game)
+  end
+
+  def awaken(bot, refpid, game) do 
+    spawn Bot, :mainloop, [refpid, game]
   end
 
 end
