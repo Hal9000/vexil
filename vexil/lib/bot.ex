@@ -1,3 +1,16 @@
+defmodule Comms do 
+
+  def sendrecv(pid, data) do
+    send(pid, data)      # send move to referee
+    result = receive do  # receive new grid and return val from referee
+      {grid, ret} ->
+        {grid, ret}
+    end
+    result
+  end
+
+end
+
 defmodule Bot do
 
   defstruct team: nil, kind: nil, move: nil, see: nil, 
@@ -40,13 +53,34 @@ defmodule Bot do
     x2 = bot.x + dx
     y2 = bot.y + dy
 
-    # FIXME will send msg to referee
+    bot =
+    if not Referee.over?(game) do
+      Referee.record(game, :move, bot)  # $game.record("#{self.who} moves to #@x,#@y")
+      bot2 = Map.update(bot, :x, x2, fn(x) -> x end)
+      Map.update(bot2, :y, y2, fn(x) -> x end)
+    end
 
+    # FIXME will send msg to referee
+    {game, bot} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
     {game, bot}
   end
 
-  def turn(:fighter, bot, refpid, game) do
+  def try_move(game, bot, dx, dy) do
+    {game, bot} = 
+    cond do  # Try successive moves
+      move(game, bot, dx, dy)     -> nil
+      move(game, bot, dx-1, dy+1) -> nil
+      move(game, bot, dx+1, dy-1) -> nil
+      move(game, bot, dx-2, dy+2) -> nil
+      move(game, bot, dx+2, dy-2) -> nil
+    end
+    {game, bot}
+  end
+
+  def turn(:fighter, bot, game) do
     # FIXME will call move, attack
+    IO.puts "figter takes a turn..."
+    try_move(game, bot, 2, 2)
 ##    return if $game.over?
 ##    seek_flag
 ##
@@ -56,7 +90,7 @@ defmodule Bot do
 ##    move!(2, 2)
   end
 
-  def turn(:defender, bot, refpid, game) do
+  def turn(:defender, _bot, _game) do
     # FIXME will call move, attack
 ##    return if $game.over?
 ##    @strength = @attack
@@ -64,8 +98,9 @@ defmodule Bot do
 ##    victims.each {|enemy| try_attack(3, enemy) || break }
   end
 
-  def turn(:scout, bot, refpid, game) do
+  def turn(:scout, bot, game) do
     # FIXME will call move, attack
+    try_move(game, bot, 3, 3)
 ##    return if $game.over?
 ##    seek_flag
 ##
@@ -75,15 +110,18 @@ defmodule Bot do
 ##    move!(3, 3)
   end
 
-  def mainloop(bot, refpid, game) do
+  def turn(:flag, _, _), do: nil
+
+  def mainloop(bot, game) do
     # the bot lives its life -- run, attack, whatever
     # see 'turn' in Ruby version
-    turn(bot.kind, bot, refpid, game)
-    mainloop(bot, refpid, game)
+#   IO.puts "bot mainloop #{bot.kind}"
+    turn(bot.kind, bot, game)
+    mainloop(bot, game)
   end
 
-  def awaken(bot, refpid, game) do 
-    spawn Bot, :mainloop, [refpid, game]
+  def awaken(bot, game) do 
+    spawn Bot, :mainloop, [bot, game]
   end
 
 end

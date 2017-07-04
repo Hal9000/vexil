@@ -11,39 +11,38 @@
 ###   break if $game.over?
 ### end
 
-defmodule Comms do 
-
-  def sendrecv(pid, data) do
-    send(pid, data)      # send move to referee
-    result = receive do  # receive new grid and return val from referee
-      {grid, ret} ->
-        {grid, ret}
-    end
-IO.puts "got a result"
-IO.inspect result
-    result
-  end
-
-end
-
 
 :rand.seed(:exsplus, {0,0,0})
 
-game = %{}
-{game, bots} = Referee.setup(game)
-Grid.display(game)
+game = Referee.new
 
-pid = Referee.start(game, bots)
+Referee.display(game)
+
+IO.puts "got here"
+
+game = Referee.start(game)
 
 # IO.puts "cp3 - grid = #{inspect game}"
 
 :timer.sleep 2000
+Referee.display(game)
 
-{game, ret} = Comms.sendrecv(pid, {self(), :move, :red, 5, 3, 4, 3})
+# {game, ret} = Comms.sendrecv(pid, {self(), :move, :red, 5, 3, 4, 3})
 
 # IO.inspect foo
 
 :timer.sleep 2000
-Grid.display(game)
-
-
+Referee.display(game)
+# 
+# :timer.sleep 1000
+# Referee.display(game)
+# 
+# :timer.sleep 1000
+# Referee.display(game)
+# 
+# :timer.sleep 1000
+# Referee.display(game)
+# 
+# :timer.sleep 1000
+# Referee.display(game)
+# 

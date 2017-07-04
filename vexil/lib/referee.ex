@@ -40,18 +40,26 @@ end
 
 defmodule Referee do
 
+  defstruct [:grid, :bots, :pid]
+
+  def new do 
+    {grid, bots} = setup(%{})
+    %Referee{grid: grid, bots: bots, pid: nil}
+  end
+
   def place(grid, bots, team, kind, x, y) do
-# IO.inspect [:PLACE, team, kind, x, y]
+# # IO.inspect [:PLACE, team, kind, x, y]
     x2 = if Range.range?(x), do: rand(x), else: x
     y2 = if Range.range?(y), do: rand(y), else: y
     
     bot = Bot.make(kind, team, x2, y2)
-    {grid, bots} = if Grid.cell_empty?(grid, {team, x2, y2}) do
+    {grid, bots} = 
+    if Grid.cell_empty?(grid, {team, x2, y2}) do
       {Grid.put(grid, {team, x2, y2}, bot), bots}
     else
       place(grid, bots, team, kind, x, y)
     end
-#   bots = [bot] ++ bots
+    bots = [bot] ++ bots
     {grid, bots}
   end
 
@@ -59,8 +67,9 @@ defmodule Referee do
   def rand(n1..n2), do: :rand.uniform(n2 - n1 + 1) + n1 - 1
 
   def setup(grid) do
-    {grid, bots} = setup(grid, :red)
-    {grid, bots} = setup(grid, :blue)
+    {grid, redbots} = setup(grid, :red)
+    {grid, bluebots} = setup(grid, :blue)
+    bots = redbots ++ bluebots
     {grid, bots}
   end
 
@@ -93,10 +102,14 @@ defmodule Referee do
     {grid, bots}
   end
 
+  def display(game) do
+    Grid.display(game.grid)
+  end
+
   def move(grid, team, x0, y0, x1, y1) do
-# IO.inspect [grid, team, x0, y0, x1, y1]
+# # IO.inspect [grid, team, x0, y0, x1, y1]
     piece = Grid.get(grid, {team, x0, y0})
-# IO.inspect piece
+# # IO.inspect piece
     dest = Grid.get(grid, {team, x1, y1})
 IO.puts "dest = #{inspect dest}"
     {grid, ret} = 
@@ -118,18 +131,25 @@ IO.puts "dest = #{inspect dest}"
     {grid, ret}
   end
 
-  def start(grid, bots) do
-    spawn Referee, :mainloop, [grid]
+  def over?(_x), do: false       # FIXME
+
+  def record(_x, _y, _z), do: nil  # FIXME
+
+  def start(game) do
+    pid = spawn Referee, :mainloop, [game]
+    game = %Referee{game | pid: pid}
+    Enum.each(game.bots, fn(bot) -> Bot.awaken(bot, game) end)
+    game
   end
 
-  def mainloop(grid \\ %{}) do
-    {grid, ret} = receive do
+  def mainloop(game) do
+    game = receive do
       {caller, :move, team, x0, y0, x1, y1} ->
         IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
-        {grid, ret} = move(grid, team, x0, y0, x1, y1)
-        send(caller, {grid, ret})
+        game = move(game.grid, team, x0, y0, x1, y1)
+        send(caller, game)
     end
-    mainloop(grid) # tail call optimized
+    mainloop(game) # tail call optimized
   end
 
 end
