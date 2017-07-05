@@ -61,26 +61,25 @@ defmodule Bot do
     end
 
     # FIXME will send msg to referee
-    {game, bot} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
+    game = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
     {game, bot}
   end
 
   def try_move(game, bot, dx, dy) do
     {game, bot} = 
     cond do  # Try successive moves
-      move(game, bot, dx, dy)     -> nil
-      move(game, bot, dx-1, dy+1) -> nil
-      move(game, bot, dx+1, dy-1) -> nil
-      move(game, bot, dx-2, dy+2) -> nil
-      move(game, bot, dx+2, dy-2) -> nil
+      {a, b} = move(game, bot, dx, dy)     -> {a, b}
+      {a, b} = move(game, bot, dx-1, dy+1) -> {a, b}
+      {a, b} = move(game, bot, dx+1, dy-1) -> {a, b}
+      {a, b} = move(game, bot, dx-2, dy+2) -> {a, b}
+      {a, b} = move(game, bot, dx+2, dy-2) -> {a, b}
     end
     {game, bot}
   end
 
   def turn(:fighter, bot, game) do
     # FIXME will call move, attack
-    IO.puts "figter takes a turn..."
-    try_move(game, bot, 2, 2)
+    {game, bot} = try_move(game, bot, 2, 2)
 ##    return if $game.over?
 ##    seek_flag
 ##
@@ -88,6 +87,7 @@ defmodule Bot do
 ##    victims = can_attack
 ##    victims.each {|enemy| try_attack(2, enemy) || break }
 ##    move!(2, 2)
+    {game, bot}
   end
 
   def turn(:defender, _bot, _game) do
@@ -115,8 +115,7 @@ defmodule Bot do
   def mainloop(bot, game) do
     # the bot lives its life -- run, attack, whatever
     # see 'turn' in Ruby version
-#   IO.puts "bot mainloop #{bot.kind}"
-    turn(bot.kind, bot, game)
+    {game, bot} = turn(bot.kind, bot, game)
     mainloop(bot, game)
   end
 

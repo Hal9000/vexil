@@ -21,15 +21,11 @@ defmodule Grid do
   end
 
   def display(grid) do
-#   IO.puts "\e[H\e[2J"  # clear screen
-IO.puts ""
+    IO.puts "\e[H\e[2J"  # clear screen
     yrange = 21..1
     xrange = 1..21
     Enum.each yrange, fn(y) -> 
-      Enum.each xrange, fn(x) -> 
-#       IO.puts "cell #{x}, #{y}"
-        show_cell(grid, x, y)
-      end
+      Enum.each xrange, fn(x) -> show_cell(grid, x, y) end
       IO.puts ""
     end
   end
@@ -48,7 +44,6 @@ defmodule Referee do
   end
 
   def place(grid, bots, team, kind, x, y) do
-# # IO.inspect [:PLACE, team, kind, x, y]
     x2 = if Range.range?(x), do: rand(x), else: x
     y2 = if Range.range?(y), do: rand(y), else: y
     
@@ -106,12 +101,10 @@ defmodule Referee do
     Grid.display(game.grid)
   end
 
-  def move(grid, team, x0, y0, x1, y1) do
-# # IO.inspect [grid, team, x0, y0, x1, y1]
+  def move(game, team, x0, y0, x1, y1) do
+    grid = game.grid
     piece = Grid.get(grid, {team, x0, y0})
-# # IO.inspect piece
     dest = Grid.get(grid, {team, x1, y1})
-IO.puts "dest = #{inspect dest}"
     {grid, ret} = 
       cond do 
         dest == nil ->
@@ -128,7 +121,8 @@ IO.puts "dest = #{inspect dest}"
           IO.puts "move cp3"
           {grid, false}
       end
-    {grid, ret}
+    game = %Referee{game | grid: grid}
+    game
   end
 
   def over?(_x), do: false       # FIXME
@@ -144,11 +138,14 @@ IO.puts "dest = #{inspect dest}"
 
   def mainloop(game) do
     game = receive do
-      {caller, :move, team, x0, y0, x1, y1} ->
+      {caller, game, :move, team, x0, y0, x1, y1} ->
         IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
-        game = move(game.grid, team, x0, y0, x1, y1)
-        send(caller, game)
+        g = move(game, team, x0, y0, x1, y1)
+        send(caller, g)
+        Grid.display(g.grid)
+        g
     end
+    :timer.sleep 500
     mainloop(game) # tail call optimized
   end
 
