@@ -61,11 +61,12 @@ defmodule Bot do
     end
 
     # FIXME will send msg to referee
-    game = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
-    {game, bot}
+    {game, ret} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
+    {game, bot, ret}
   end
 
   def try_move(game, bot, dx, dy) do
+    ## FIXME rewrite the hell out of this
     {game, bot} = 
     cond do  # Try successive moves
       {a, b} = move(game, bot, dx, dy)     -> {a, b}
@@ -76,6 +77,25 @@ defmodule Bot do
     end
     {game, bot}
   end
+
+  def attempt_move(game, bot, dx, dy) do
+    
+  end
+
+## credit mononym
+
+## def attempt_move(game, bot, []) do
+##     false # <-- whatever failure value here
+## end
+## 
+## def attempt_move(game, bot, [move | rest_of_moves]) do
+##     # do something here
+##     if successful do
+##         true # <-- whatever success value here
+##     else
+##         attempt_move(game, bot, rest_of_moves)
+##     end
+## end
 
   def turn(:fighter, bot, game) do
     # FIXME will call move, attack
@@ -90,12 +110,13 @@ defmodule Bot do
     {game, bot}
   end
 
-  def turn(:defender, _bot, _game) do
+  def turn(:defender, bot, game) do
     # FIXME will call move, attack
 ##    return if $game.over?
 ##    @strength = @attack
 ##    victims = can_attack
 ##    victims.each {|enemy| try_attack(3, enemy) || break }
+    {game, bot}
   end
 
   def turn(:scout, bot, game) do
@@ -108,9 +129,10 @@ defmodule Bot do
 ##    victims = can_attack
 ##    victims.each {|enemy| try_attack(1, enemy) || break }
 ##    move!(3, 3)
+    {game, bot}
   end
 
-  def turn(:flag, _, _), do: nil
+  def turn(:flag, bot, game), do: {game, bot}
 
   def mainloop(bot, game) do
     # the bot lives its life -- run, attack, whatever
