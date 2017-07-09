@@ -108,20 +108,20 @@ defmodule Referee do
     {grid, ret} = 
       cond do 
         dest == nil ->
-          IO.puts "move cp1"
+#         IO.puts "move cp1"
           g = Grid.put(grid, {team, x1, y1}, piece)
           g = Grid.put(g, {team, x0, y0}, nil)
           true = Grid.get(g, {team, x0, y0}) == nil
           true = Grid.get(g, {team, x1, y1}) != nil
           {g, true}
         dest in [:redflag, :blueflag] ->
-          IO.puts "move cp2"
+#         IO.puts "move cp2"
           g = Grid.put(grid, {team, x1, y1}, piece)
           g = Grid.put(g, {team, x0, y0}, nil)
           # FIXME mark game as over
           {g, false}  # logic??
         true ->
-          IO.puts "move cp3"
+#         IO.puts "move cp3"
           {grid, false}
       end
     game = %Referee{game | grid: grid}
@@ -145,7 +145,7 @@ defmodule Referee do
         IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
         {g, ret} = move(game, team, x0, y0, x1, y1)
         send(caller, {g, ret})
-#       Grid.display(g.grid)
+        Grid.display(g.grid)
         g
     end
     :timer.sleep 500
