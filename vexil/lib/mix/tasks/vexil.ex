@@ -1,6 +1,7 @@
-defmodule Mix.Tasks.Vexil do
+defmodule Mix.Tasks.Vexil.Game do
   use Mix.Task
 
+  @shortdoc "Run the Vexil Game"
   def run(_) do
     :rand.seed(:exsplus, {0,0,0})
     game = Referee.new
