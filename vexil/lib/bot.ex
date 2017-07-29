@@ -49,24 +49,20 @@ defmodule Bot do
     str
   end
 
-  def move(game, bot, dx, dy) do
+  def move(game, true, bot, dx, dy), do: {game, bot, false}
+
+  def move(game, false, bot, dx, dy) do
     x2 = bot.x + dx
     y2 = bot.y + dy
 
-    bot =
-    if not Referee.over?(game) do
-      # send msg to referee
-      {game, result} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
-      if result do
-        Referee.record(game, :move, bot)  # $game.record("#{self.who} moves to #@x,#@y")
-        # bot2 = Map.update(bot, :x, x2, fn(x) -> x end)
-        # Map.update(bot2, :y, y2, fn(x) -> x end)
-        bot2 = %Bot{bot | x: x2}
-        bot2 = %Bot{bot2 | y: y2}
-        bot2
-      else
-        bot
-      end
+    # send msg to referee
+    {g, result} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
+    bot2 = if result do
+      Referee.record(g, :move, bot)  # $game.record("#{self.who} moves to #@x,#@y")
+      b2 = %Bot{bot | x: x2}
+      b3 = %Bot{b2  | y: y2}
+    else
+      bot
     end
 
     {game, bot, result}
@@ -74,15 +70,15 @@ defmodule Bot do
 
   def try_moves(game, bot, dx, dy) do
     deltas = [{dx, dy}, {dx-1, dy+1}, {dx+1, dy-1}, {dx-2, dy+2}, {dx+2, dy-2}]
-    attempt_move(game, bot, deltas)
+    {game, bot} = attempt_move(game, bot, deltas)
     {game, bot}
   end
 
-  def attempt_move(game, bot, []), do: false
+  def attempt_move(game, bot, []), do: {game, bot}
 
   def attempt_move(game, bot, [dest | rest]) do
     {dx, dy} = dest
-    {game, bot, result} = move(game, bot, dx, dy)
+    {game, bot, result} = move(game, Referee.over?(game), bot, dx, dy)
     if result do
       {game, bot}
     else
@@ -92,23 +88,9 @@ defmodule Bot do
 
 ## credit mononym
 
-## def attempt_move(game, bot, []) do
-##     false # <-- whatever failure value here
-## end
-## 
-## def attempt_move(game, bot, [move | rest_of_moves]) do
-##     # do something here
-##     if successful do
-##         true # <-- whatever success value here
-##     else
-##         attempt_move(game, bot, rest_of_moves)
-##     end
-## end
-
   def turn(:fighter, bot, game) do
     # FIXME will call move, attack
     {game, bot} = try_moves(game, bot, 2, 2)
-##    return if $game.over?
 ##    seek_flag
 ##
 ##    @strength = @attack
@@ -120,7 +102,6 @@ defmodule Bot do
 
   def turn(:defender, bot, game) do
     # FIXME will call move, attack
-##    return if $game.over?
 ##    @strength = @attack
 ##    victims = can_attack
 ##    victims.each {|enemy| try_attack(3, enemy) || break }
@@ -130,7 +111,6 @@ defmodule Bot do
   def turn(:scout, bot, game) do
     # FIXME will call move, attack
     try_moves(game, bot, 3, 3)
-##    return if $game.over?
 ##    seek_flag
 ##
 ##    @strength = @attack

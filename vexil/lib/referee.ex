@@ -22,12 +22,18 @@ defmodule Grid do
 
   def display(grid) do
     IO.puts "\e[H\e[2J"  # clear screen
+    IO.puts ""
     yrange = 21..1
     xrange = 1..21
     Enum.each yrange, fn(y) -> 
       Enum.each xrange, fn(x) -> show_cell(grid, x, y) end
       IO.puts ""
     end
+  end
+
+  def signature(grid) do
+    str = inspect grid
+    :crypto.hash(:md5, str)
   end
 
 end
@@ -41,6 +47,15 @@ defmodule Referee do
   def new do 
     {grid, bots} = setup(%{})
     %Referee{grid: grid, bots: bots, pid: nil}
+  end
+
+  def verify(where, sig1, sig2) do
+    IO.puts "#{where}: #{Base.encode16(sig1)} -> #{Base.encode16(sig2)}"
+    if sig1 == sig2 do
+      IO.puts "  grid has NOT changed"
+    else
+      IO.puts "  grid has changed"
+    end
   end
 
   def place(grid, bots, team, kind, x, y) do
@@ -103,28 +118,28 @@ defmodule Referee do
 
   def move(game, team, x0, y0, x1, y1) do
     grid = game.grid
+    sig1 = Grid.signature(grid)
     piece = Grid.get(grid, {team, x0, y0})
     dest = Grid.get(grid, {team, x1, y1})
     {grid, ret} = 
       cond do 
         dest == nil ->
-#         IO.puts "move cp1"
+          IO.puts "move: normal case"
           g = Grid.put(grid, {team, x1, y1}, piece)
           g = Grid.put(g, {team, x0, y0}, nil)
-          true = Grid.get(g, {team, x0, y0}) == nil
-          true = Grid.get(g, {team, x1, y1}) != nil
           {g, true}
         dest in [:redflag, :blueflag] ->
-#         IO.puts "move cp2"
           g = Grid.put(grid, {team, x1, y1}, piece)
           g = Grid.put(g, {team, x0, y0}, nil)
           # FIXME mark game as over
           {g, false}  # logic??
         true ->
-#         IO.puts "move cp3"
+          IO.puts "SOMETHING WRONG?"
           {grid, false}
       end
     game = %Referee{game | grid: grid}
+    sig2 = Grid.signature(grid)
+    verify("move", sig1, sig2)
     {game, ret}
   end
 
@@ -140,16 +155,19 @@ defmodule Referee do
   end
 
   def mainloop(game) do
-    game = receive do
+    sig1 = Grid.signature(game.grid)
+    g = receive do
       {caller, game, :move, team, x0, y0, x1, y1} ->
         IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
-        {g, ret} = move(game, team, x0, y0, x1, y1)
-        send(caller, {g, ret})
-        Grid.display(g.grid)
-        g
+        {g2, ret} = move(game, team, x0, y0, x1, y1)
+        send(caller, {g2, ret})
+#       display(g2)
+        sig2 = Grid.signature(g2.grid)
+        verify("mainloop", sig1, sig2)
+        g2
     end
-    :timer.sleep 500
-    mainloop(game) # tail call optimized
+    :timer.sleep 200
+    mainloop(g) # tail call optimized
   end
 
 end

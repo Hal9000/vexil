@@ -20,6 +20,6 @@ Referee.display(game)
 
 game = Referee.start(game)
 
-:timer.sleep 20000
+:timer.sleep 40000
 # Referee.display(game)
 
