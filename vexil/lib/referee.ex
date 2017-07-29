@@ -124,7 +124,7 @@ defmodule Referee do
     {grid, ret} = 
       cond do 
         dest == nil ->
-          IO.puts "move: normal case"
+#         IO.puts "move: normal case"
           g = Grid.put(grid, {team, x1, y1}, piece)
           g = Grid.put(g, {team, x0, y0}, nil)
           {g, true}
@@ -134,12 +134,12 @@ defmodule Referee do
           # FIXME mark game as over
           {g, false}  # logic??
         true ->
-          IO.puts "SOMETHING WRONG?"
+#         IO.puts "SOMETHING WRONG?"
           {grid, false}
       end
     game = %Referee{game | grid: grid}
     sig2 = Grid.signature(grid)
-    verify("move", sig1, sig2)
+#   verify("move", sig1, sig2)
     {game, ret}
   end
 
@@ -155,18 +155,18 @@ defmodule Referee do
   end
 
   def mainloop(game) do
-    sig1 = Grid.signature(game.grid)
+#   sig1 = Grid.signature(game.grid)
     g = receive do
-      {caller, game, :move, team, x0, y0, x1, y1} ->
-        IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
+      {caller, _bot_game, :move, team, x0, y0, x1, y1} ->
+#       IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
         {g2, ret} = move(game, team, x0, y0, x1, y1)
         send(caller, {g2, ret})
-#       display(g2)
-        sig2 = Grid.signature(g2.grid)
-        verify("mainloop", sig1, sig2)
+#       sig2 = Grid.signature(g2.grid)
+#       verify("mainloop", sig1, sig2)
         g2
     end
-    :timer.sleep 200
+    display(g)
+#   :timer.sleep 200
     mainloop(g) # tail call optimized
   end
 

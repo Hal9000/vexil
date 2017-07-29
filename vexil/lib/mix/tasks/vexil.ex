@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Vexil.Game do
     game = Referee.new
     Referee.display(game)
     game = Referee.start(game)
-    :timer.sleep 40000 
+    :timer.sleep 400000 
     # Referee.display(game)
   end
 
