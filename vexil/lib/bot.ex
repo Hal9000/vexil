@@ -49,6 +49,63 @@ defmodule Bot do
     str
   end
 
+# Move to Grid??
+
+  def within(game, bot, n) do
+    found = []
+    grid = game.grid
+    team = bot.team
+    {x, y} = {bot.x, bot.y}
+    {x0, y0, x1, y1} = {x-n, x+n, y-n, y+n}
+    {xr, yr} = {x0..x1, y0..y1}
+    found = 
+    Enum.each(xr, fn(x) -> 
+      Enum.each(yr, fn(y) ->
+        piece = Grid.get(grid, {team, x, y})
+        cond do 
+          piece == nil -> nil
+          {x, y} == {bot.x, bot.y} -> nil
+          found ++ [piece]
+        end
+      end)
+    end)
+    found
+  end
+
+  def where(bot) do
+    {bot.x, bot.y}
+  end
+
+  def enemy?(me, piece) do
+    me.team != piece.team
+  end
+
+  def can_see(game, me) do
+    within(game, me, me.see)
+  end
+
+  def can_attack(game, me) do  # Things I can attack
+    list = within(game, me, me.range)
+#   list = list.reject {|x| x.is_a? Flag }
+  end
+  
+  def seek_flag(game, me) do  # FIXME!!
+    stuff = can_see(game, me)
+# Ruby code:
+#   flag = stuff.select {|x| x.is_a? Flag }.first
+#   unless flag.nil?  # Remember to tell others where flag is
+#     fx, fy = flag.where
+#     fx, fy = 22 - fx, 22 - fy  # native coordinates
+#     dx, dy = fx - @x, fy - @y
+#     $game.record "#{self.who} can see enemy flag at #{fx},#{fy}"
+#     if (dx.abs + dy.abs) <= @move  # we can get there
+#       $game.record "#{self.who} captures flag!"
+#       move(dx, dy)
+#     end
+#   end
+  end
+
+
   def move(game, true, bot, dx, dy), do: {game, bot, false}
 
   def move(game, false, bot, dx, dy) do

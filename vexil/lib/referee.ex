@@ -42,11 +42,11 @@ end
 
 defmodule Referee do
 
-  defstruct [:grid, :bots, :pid]
+  defstruct [:grid, :bots, :pid, :over?]
 
   def new do 
     {grid, bots} = setup(%{})
-    %Referee{grid: grid, bots: bots, pid: nil}
+    %Referee{grid: grid, bots: bots, pid: nil, over?: false}
   end
 
   def verify(where, sig1, sig2) do
@@ -118,7 +118,6 @@ defmodule Referee do
 
   def move(game, team, x0, y0, x1, y1) do
     grid = game.grid
-    sig1 = Grid.signature(grid)
     piece = Grid.get(grid, {team, x0, y0})
     dest = Grid.get(grid, {team, x1, y1})
     {grid, ret} = 
@@ -132,18 +131,17 @@ defmodule Referee do
           g = Grid.put(grid, {team, x1, y1}, piece)
           g = Grid.put(g, {team, x0, y0}, nil)
           # FIXME mark game as over
+          IO.puts "Moved onto #{dest} - game over - FIXME"
           {g, false}  # logic??
         true ->
-#         IO.puts "SOMETHING WRONG?"
+          IO.puts "SOMETHING WRONG? Can't move #{inspect piece} onto #{inspect dest}"
           {grid, false}
       end
     game = %Referee{game | grid: grid}
-    sig2 = Grid.signature(grid)
-#   verify("move", sig1, sig2)
     {game, ret}
   end
 
-  def over?(_x), do: false       # FIXME
+  def over?(game), do: game.over?
 
   def record(_x, _y, _z), do: nil  # FIXME
 
@@ -155,18 +153,17 @@ defmodule Referee do
   end
 
   def mainloop(game) do
-#   sig1 = Grid.signature(game.grid)
     g = receive do
       {caller, _bot_game, :move, team, x0, y0, x1, y1} ->
 #       IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
         {g2, ret} = move(game, team, x0, y0, x1, y1)
-        send(caller, {g2, ret})
-#       sig2 = Grid.signature(g2.grid)
-#       verify("mainloop", sig1, sig2)
+        if ret do
+          send(caller, {g2, ret})
+        end
         g2
     end
     display(g)
-#   :timer.sleep 200
+    :timer.sleep 200
     mainloop(g) # tail call optimized
   end
 
