@@ -18,13 +18,23 @@ defmodule BotTest do
     refute Bot.enemy?(bob, nik)
   end
 
-  test "within " do
-    grid = %{}
-    bots = []
-    game = %Referee{grid: grid, bots: bots}
-    bot = Bot.scout(:red, 1, 2)
-    bots_near_me = Bot.within(game, bot, 2)
-    assert bots_near_me == "bob"
+  # returns portion of grid slice
+  #    1  2   3
+  # 1  R  R   . 
+  # 2  B  me  .
+  # 3  R  .   B
+  # grid_slice(grid, myself, 1)
+  test "grid_slice" do
+    Bot.grid_slice(grid, bot, size)
   end
+
+  # test "within " do
+  #   grid = %{}
+  #   bots = []
+  #   game = %Referee{grid: grid, bots: bots}
+  #   bot = Bot.scout(:red, 1, 2)
+  #   bots_near_me = Bot.within(game, bot, 2)
+  #   assert bots_near_me == "bob"
+  # end
 
 end
