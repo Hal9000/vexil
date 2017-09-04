@@ -18,5 +18,13 @@ defmodule BotTest do
     refute Bot.enemy?(bob, nik)
   end
 
+  test "within " do
+    grid = %{}
+    bots = []
+    game = %Referee{grid: grid, bots: bots}
+    bot = Bot.scout(:red, 1, 2)
+    bots_near_me = Bot.within(game, bot, 2)
+    assert bots_near_me == "bob"
+  end
 
 end
