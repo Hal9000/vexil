@@ -1,20 +1,7 @@
-defmodule Comms do 
-
-  def sendrecv(pid, data) do
-    send(pid, data)      # send move to referee
-    result = receive do  # receive new grid and return val from referee
-      {grid, ret} ->
-        {grid, ret}
-    end
-    result
-  end
-
-end
-
 defmodule Bot do
 
-  defstruct team: nil, kind: nil, move: nil, see: nil, 
-            defend: nil, attack: nil, range: nil, 
+  defstruct team: nil, kind: nil, move: nil, see: nil,
+            defend: nil, attack: nil, range: nil,
             x: nil, y: nil
 
   def defender(team, x, y) do
@@ -40,7 +27,7 @@ defmodule Bot do
   def to_string(bot) do
     initial = bot.kind |> Atom.to_string |> String.capitalize |> String.first
     char = if bot.kind == :flag, do: "X", else: initial
-    str = 
+    str =
     if bot.team == :red do
       "\e[31m#{char}\e[0m"
     else
@@ -58,11 +45,11 @@ defmodule Bot do
     {x, y} = {bot.x, bot.y}
     {x0, y0, x1, y1} = {x-n, x+n, y-n, y+n}
     {xr, yr} = {x0..x1, y0..y1}
-    found = 
-    Enum.each(xr, fn(x) -> 
+    found =
+    Enum.each(xr, fn(x) ->
       Enum.each(yr, fn(y) ->
         piece = Grid.get(grid, {team, x, y})
-        cond do 
+        cond do
           piece == nil -> nil
           {x, y} == {bot.x, bot.y} -> nil
           found ++ [piece]
@@ -88,7 +75,7 @@ defmodule Bot do
     list = within(game, me, me.range)
 #   list = list.reject {|x| x.is_a? Flag }
   end
-  
+
   def seek_flag(game, me) do  # FIXME!!
     stuff = can_see(game, me)
 # Ruby code:
@@ -186,7 +173,7 @@ defmodule Bot do
     mainloop(bot, game)
   end
 
-  def awaken(bot, game) do 
+  def awaken(bot, game) do
     spawn Bot, :mainloop, [bot, game]
   end
 
