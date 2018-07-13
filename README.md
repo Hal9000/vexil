@@ -1,3 +1,27 @@
+QUICK START
+-----------
+For more detail and background, see below.
+
+Directories:
+
+ruby-v1    First Ruby version
+ruby-v2    Threaded Ruby version
+vexil      Elixir version (in progress)
+
+First, `cd` into the `vexil` directory.
+
+`mix test` To run tests
+`mix vexil.game run` To run the game itself
+
+The code is very incomplete and buggy.
+
+Next steps:
+  - more tests?
+  - fix grid display issues
+  - detect end of game and terminate
+  - show ongoing history
+
+
 Vexil 
 -----
 

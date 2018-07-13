@@ -7,6 +7,10 @@ defmodule Referee do
     %Referee{grid: grid, bots: bots, pid: nil, over?: false}
   end
 
+  def new(grid, bots) do
+    %Referee{grid: grid, bots: bots, pid: nil, over?: false}
+  end
+
   def verify(where, sig1, sig2) do
     IO.puts "#{where}: #{Base.encode16(sig1)} -> #{Base.encode16(sig2)}"
     if sig1 == sig2 do
@@ -110,6 +114,11 @@ defmodule Referee do
     game
   end
 
+  def simulate(game) do 
+    pid = spawn Referee, :mainloop, [game]
+    %Referee{game | pid: pid}
+  end
+
   def mainloop(game) do
     g = receive do
       {caller, _bot_game, :move, team, x0, y0, x1, y1} ->
@@ -120,9 +129,9 @@ defmodule Referee do
         end
         g2
     end
-    display(g)
+    IO.puts "debugging..."
     :timer.sleep 200
-    mainloop(g) # tail call optimized
+    mainloop(g) # tail recursion
   end
 
 end

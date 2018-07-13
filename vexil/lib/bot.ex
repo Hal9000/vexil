@@ -39,24 +39,20 @@ defmodule Bot do
 # Move to Grid??
 
   def within(game, bot, n) do
+    IO.puts "grid = #{inspect game.grid}"
+    IO.puts "bot = #{inspect bot}"
     found = []
     grid = game.grid
     team = bot.team
     {x, y} = {bot.x, bot.y}
     {x0, y0, x1, y1} = {x-n, x+n, y-n, y+n}
     {xr, yr} = {x0..x1, y0..y1}
-    found =
-    Enum.each(xr, fn(x) ->
-      Enum.each(yr, fn(y) ->
-        piece = Grid.get(grid, {team, x, y})
-        cond do
-          piece == nil -> nil
-          {x, y} == {bot.x, bot.y} -> nil
-          found ++ [piece]
-        end
-      end)
-    end)
-    found
+    
+    filter = &(&1 == nil or Bot.where(&1) == Bot.where(bot))
+    list = for x <- xr, y <- yr do
+      piece = Grid.get(grid, {team, x, y})
+    end
+    Enum.reject(list, filter)
   end
 
   def where(bot) do

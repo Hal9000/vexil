@@ -9,9 +9,15 @@ defmodule GridTest do
     assert Grid.get(grid, where) == val
   end
 
-  test "show cell" do
-    grid = Grid.put(%{}, {:red, 1, 1}, "piece")    
-    assert Grid.show_cell(grid, 1, 2) == :ok
+  test "empty cell as string" do
+    grid = Grid.put(%{}, {:red, 1, 1}, nil)    
+    assert Grid.cell(grid, 1, 2) == "-"
+  end
+
+  test "occupied cell as string" do
+    bot = Bot.defender(:red, 3, 3)
+    grid = Grid.put(%{}, {:red, 3, 3}, bot)    
+    assert Grid.cell(grid, 3, 3) == "\e[31mD\e[0m"
   end
 
 
