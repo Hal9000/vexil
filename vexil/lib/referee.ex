@@ -96,7 +96,7 @@ defmodule Referee do
           IO.puts "Moved onto #{dest} - game over - FIXME"
           {g, false}  # logic??
         true ->
-          IO.puts "SOMETHING WRONG? Can't move #{inspect piece} onto #{inspect dest}"
+#         IO.puts "SOMETHING WRONG? Can't move #{inspect piece} onto #{inspect dest}"
           {grid, false}
       end
     game = %Referee{game | grid: grid}
@@ -129,7 +129,7 @@ defmodule Referee do
         end
         g2
     end
-    IO.puts "debugging..."
+#   IO.puts "debugging..."
     :timer.sleep 200
     mainloop(g) # tail recursion
   end

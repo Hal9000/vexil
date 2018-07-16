@@ -17,6 +17,7 @@ The code is very incomplete and buggy.
 
 Next steps:
   - more tests?
+  - dialyxir?
   - fix grid display issues
   - detect end of game and terminate
   - show ongoing history
