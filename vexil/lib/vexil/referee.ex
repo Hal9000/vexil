@@ -1,4 +1,5 @@
-defmodule Referee do
+defmodule Vexil.Referee do
+  alias Vexil.{Bot, Grid, Referee}
 
   defstruct [:grid, :bots, :pid, :over?]
 
@@ -107,8 +108,8 @@ defmodule Referee do
 
   def record(_x, _y, _z), do: nil  # FIXME
 
-  def start(game) do
-    pid = spawn Referee, :mainloop, [game]
+  def start_link(game) do
+    pid = spawn_link Referee, :mainloop, [game]
     game = %Referee{game | pid: pid}
     Enum.each(game.bots, fn(bot) -> Bot.awaken(bot, game) end)
     game
@@ -120,6 +121,8 @@ defmodule Referee do
   end
 
   def mainloop(game) do
+#   IO.puts "game pid in REF = #{inspect game.pid}"
+#   IO.puts "REF pid = #{inspect self()}"
     g = receive do
       {caller, _bot_game, :move, team, x0, y0, x1, y1} ->
 #       IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"
@@ -128,6 +131,8 @@ defmodule Referee do
           send(caller, {g2, ret})
         end
         g2
+      other -> IO.puts "Got: #{inspect(other)}"
+      after 5000 -> IO.puts "referee Timeout 5 sec"
     end
 #   IO.puts "debugging..."
     :timer.sleep 200

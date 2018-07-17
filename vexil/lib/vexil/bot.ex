@@ -1,4 +1,5 @@
-defmodule Bot do
+defmodule Vexil.Bot do
+  alias Vexil.{Bot, Comms, Grid, Referee}
 
   defstruct team: nil, kind: nil, move: nil, see: nil,
             defend: nil, attack: nil, range: nil,
@@ -39,8 +40,8 @@ defmodule Bot do
 # Move to Grid??
 
   def within(game, bot, n) do
-    IO.puts "grid = #{inspect game.grid}"
-    IO.puts "bot = #{inspect bot}"
+#   IO.puts "grid = #{inspect game.grid}"
+#   IO.puts "bot = #{inspect bot}"
     found = []
     grid = game.grid
     team = bot.team
@@ -96,7 +97,9 @@ defmodule Bot do
     y2 = bot.y + dy
 
     # send msg to referee
+#   IO.puts "game pid in bot = #{inspect game.pid}"
     {g, result} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
+#   IO.puts "---- AFTER sendrecv"
     bot2 = if result do
       Referee.record(g, :move, bot)  # $game.record("#{self.who} moves to #@x,#@y")
       b2 = %Bot{bot | x: x2}
@@ -105,7 +108,7 @@ defmodule Bot do
       bot
     end
 
-    {game, bot, result}
+    {game, bot2, result}
   end
 
   def try_moves(game, bot, dx, dy) do
@@ -117,6 +120,7 @@ defmodule Bot do
   def attempt_move(game, bot, []), do: {game, bot}
 
   def attempt_move(game, bot, [dest | rest]) do
+#   IO.puts "Attempting move - #{inspect bot} to #{inspect dest}"
     {dx, dy} = dest
     {game, bot, result} = move(game, Referee.over?(game), bot, dx, dy)
     if result do
@@ -170,7 +174,7 @@ defmodule Bot do
   end
 
   def awaken(bot, game) do
-    spawn Bot, :mainloop, [bot, game]
+    spawn_link Bot, :mainloop, [bot, game]
   end
 
 end

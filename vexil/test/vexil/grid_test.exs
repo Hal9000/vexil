@@ -1,6 +1,10 @@
 defmodule GridTest do
   use ExUnit.Case
 
+  alias Vexil.{Bot, Grid}
+
+  doctest Grid
+
   test "put and get" do
     grid = %{}
     where = {:red, 3, 5}

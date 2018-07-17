@@ -1,9 +1,17 @@
-defmodule BotTest do
+defmodule Vexil.BotTest do
   use ExUnit.Case
 
-  test "where" do
-    bob = Bot.scout(:red, 1, 5)
-    assert Bot.where(bob) == {1, 5}
+  alias Vexil.{Bot, Grid}
+
+  describe "where/1" do
+    test "with red" do
+      bob = Bot.scout(:red, 1, 5)
+      assert Bot.where(bob) == {1, 5}
+    end
+    test "with blue" do
+      bob = Bot.scout(:blue, 1, 5)
+      assert Bot.where(bob) == {1, 5}
+    end
   end
 
   test "enemy? true when two bots different colors" do
@@ -34,7 +42,7 @@ defmodule BotTest do
     grid = Grid.put(grid, bs2)
     grid = Grid.put(grid, bf)
     grid = Grid.put(grid, bd)
-    Referee.new(grid, bots)
+    # Referee.new(grid, bots)
     # game = Referee.new(grid, bots)
     # IO.inspect Bot.can_see(game, rd)
   end

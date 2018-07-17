@@ -1,6 +1,21 @@
 # Also credit di4na mjadczak
 
-defmodule Grid do
+defmodule Vexil.Grid do
+  alias Vexil.{Bot, Grid}
+  
+  @doc """
+  Translates from team coordinates to global coordinates.
+  
+      iex> g = Grid.new
+      iex> g = Grid.put(g, {:blue, 3, 5}, "junk")
+      iex> Grid.get(g, {:red, 3, 5})
+      nil
+      iex> Grid.get(g, {:blue, 3, 5})
+      "junk"
+      iex> Grid.get(g, {:red, 19, 17})
+      "junk"
+      
+  """
 
   def get(grid, {:red, x, y}),  do: Map.get(grid, {:red, x, y})
   def get(grid, {:blue, x, y}), do: Map.get(grid, {:red, 22-x, 22-y})

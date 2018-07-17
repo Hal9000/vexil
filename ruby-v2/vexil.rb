@@ -7,6 +7,8 @@ $game = Referee.new
 $game.setup
 $game.display
 
+gets
+
 $game.start!
 
 loop do 
