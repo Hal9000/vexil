@@ -98,6 +98,7 @@ defmodule Vexil.Bot do
 
     # send msg to referee
 #   IO.puts "game pid in bot = #{inspect game.pid}"
+#   IO.puts "#{inspect self()} sends to referee"
     {g, result} = Comms.sendrecv(game.pid, {self(), game, :move, bot.team, bot.x, bot.y, x2, y2})
 #   IO.puts "---- AFTER sendrecv"
     bot2 = if result do
@@ -120,7 +121,7 @@ defmodule Vexil.Bot do
   def attempt_move(game, bot, []), do: {game, bot}
 
   def attempt_move(game, bot, [dest | rest]) do
-#   IO.puts "Attempting move - #{inspect bot} to #{inspect dest}"
+    IO.puts "Attempting move - #{inspect bot} to #{inspect dest}"
     {dx, dy} = dest
     {game, bot, result} = move(game, Referee.over?(game), bot, dx, dy)
     if result do
@@ -174,6 +175,7 @@ defmodule Vexil.Bot do
   end
 
   def awaken(bot, game) do
+    :timer.sleep 100
     spawn_link Bot, :mainloop, [bot, game]
   end
 

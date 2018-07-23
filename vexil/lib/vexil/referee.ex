@@ -123,6 +123,7 @@ defmodule Vexil.Referee do
   def mainloop(game) do
 #   IO.puts "game pid in REF = #{inspect game.pid}"
 #   IO.puts "REF pid = #{inspect self()}"
+#   IO.puts "Referee is listening..."
     g = receive do
       {caller, _bot_game, :move, team, x0, y0, x1, y1} ->
 #       IO.puts "mainloop: #{team} moves from #{inspect {x0, y0}} to #{inspect {x1, y1}}"

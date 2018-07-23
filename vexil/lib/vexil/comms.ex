@@ -4,7 +4,7 @@ defmodule Vexil.Comms do
 #   IO.inspect(data, label: "sending to #{inspect(pid)}")
 #   IO.puts("#{inspect data}")
     send(pid, data)      # send move to referee
-    raise "hell - #{inspect pid} data = #{inspect data}"
+#   raise "hell - #{inspect pid} data = #{inspect data}"
     result = receive do  # receive new grid and return val from referee
       {grid, ret} ->
         {grid, ret}
